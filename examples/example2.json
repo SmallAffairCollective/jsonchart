@@ -1,0 +1,26 @@
+{
+    "gpus": [
+        {
+            "index": "0", 
+            "processes": [], 
+            "uuid": "GPU-d95b69a5-e898-04ca-92de-7697a68b2f2f", 
+            "memory.used": "41", 
+            "temperature.gpu": "32", 
+            "utilization.gpu": "0", 
+            "memory.total": "4066", 
+            "name": "GeForce GTX 980"
+        }, 
+        {
+            "index": "1", 
+            "processes": [], 
+            "uuid": "GPU-650c91ec-0b73-3bda-0d74-466bd489e29a", 
+            "memory.used": "1", 
+            "temperature.gpu": "29", 
+            "utilization.gpu": "0", 
+            "memory.total": "4069", 
+            "name": "GeForce GTX 980"
+        }
+    ], 
+    "query_time": 1501037515.537863, 
+    "hostname": "hostA"
+}
