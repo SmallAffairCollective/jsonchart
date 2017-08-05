@@ -16,6 +16,8 @@ func main() {
 	fmt.Println(state)
 	matrix := getStoredMetricMatrix(url, conn)
 	fmt.Println(matrix)
+	flattenedMatrix := flattenMetricMatrix(url, matrix)
+	printMatrix(flattenedMatrix)
 	defer conn.Close()
 }
 
