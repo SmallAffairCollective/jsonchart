@@ -1,24 +1,42 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"strconv"
+	"time"
 )
 
 func main() {
-	url := os.Args[1] // url from command line
+	arg1 := os.Args[1] // url from command line
+	arg2 := os.Args[2] // delay from cmd in secs
+	arg3 := os.Args[3] // iterations from cmd
 
-	jsonMap := fetchUrl(url)
-	metrics := getMetrics(jsonMap)
-	fmt.Println(metrics)
-	conn := connectRedis("redis")
-	state := storeMetrics(url, conn, metrics)
-	fmt.Println(state)
-	matrix := getStoredMetricMatrix(url, conn)
-	fmt.Println(matrix)
-	flattenedMatrix := flattenMetricMatrix(url, matrix)
-	printMatrix(flattenedMatrix)
-	defer conn.Close()
+	// convert delay and iterations from strings to ints
+	delay, er := strconv.Atoi(arg2)
+	check(er)
+	iterations, er := strconv.Atoi(arg3)
+	check(er)
+
+	// TODO write regex to make sure arg1 is a valid url
+
+	alwaysBeGettin(arg1, delay, iterations)
+}
+
+func alwaysBeGettin(url string, delay int, iterations int) {
+
+	i := 1
+	for i <= iterations {
+		jsonMap := fetchUrl(url)
+		metrics := getMetrics(jsonMap)
+		conn := connectRedis("redis")
+		storeMetrics(url, conn, metrics)
+		matrix := getStoredMetricMatrix(url, conn)
+		flattenedMatrix := flattenMetricMatrix(url, matrix)
+		printMatrix(flattenedMatrix)
+		defer conn.Close()
+		time.Sleep(time.Second * time.Duration(delay))
+		i++
+	}
 }
 
 func check(e error) {

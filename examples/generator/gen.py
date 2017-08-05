@@ -7,7 +7,7 @@ class GeneratorServer(object):
     """
     This class is responsible for initializing the urls and web server.
     """
-    def __init__(self, port=8080, host='0.0.0.0'):
+    def __init__(self, port=80, host='0.0.0.0'):
         inst = Generator()
         urls = inst.urls()
         app = web.application(urls, globals())
