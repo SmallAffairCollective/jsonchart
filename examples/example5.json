@@ -1,0 +1,10 @@
+        {
+            "index": "0", 
+            "processes": [], 
+            "uuid": "GPU-d95b69a5-e898-04ca-92de-7697a68b2f2f", 
+            "memory.used": "41", 
+            "temperature.gpu": "32", 
+            "utilization.gpu": "0", 
+            "memory.total": "4066", 
+            "name": "GeForce GTX 980"
+        } 
