@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/mediocregopher/radix.v2/redis"
+	"github.com/tidwall/gjson"
 )
 
 func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
@@ -67,4 +69,28 @@ func getStoredMetricMatrix(url string, conn *redis.Client) map[string]map[string
 	}
 
 	return matrix
+}
+
+func goDeeper(stringRes string, path map[string]string, key string) map[string]string {
+
+	// this is brokenz
+
+	r := gjson.Get(stringRes, key)
+	r.ForEach(func(k, value gjson.Result) bool {
+		switch value.Value().(type) {
+		case []interface{}:
+			fmt.Println("array:", path, key, value.String())
+			path = goDeeper(value.String(), path, key)
+		case map[string]interface{}:
+			fmt.Println("map:", path, key, value.String())
+			path = goDeeper(value.String(), path, key)
+		default:
+			fmt.Println("in default:", value.Value())
+			path[key] = value.String()
+			fmt.Println("default:", path, key, value.String())
+		}
+		return true // keep iterating
+	})
+
+	return path
 }
