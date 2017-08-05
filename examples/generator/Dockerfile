@@ -10,5 +10,7 @@ COPY . /generator
 WORKDIR /generator
 RUN pip install -r requirements.txt
 
+EXPOSE 80
+
 ENTRYPOINT ["python", "gen.py"]
 CMD [""]
