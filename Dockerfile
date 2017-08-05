@@ -8,4 +8,4 @@ RUN go get github.com/SmallAffairCollective/jsonchart
 WORKDIR /go/src/github.com/SmallAffairCollective/jsonchart
 
 ENTRYPOINT ["/go/bin/jsonchart"]
-CMD ["-h"]
+CMD [""]

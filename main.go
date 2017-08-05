@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 func main() {
-	fmt.Println("o hai!")
-	fmt.Println("what?!")
+	url := os.Args[1]
+	fmt.Println("url is ", url)
 }
