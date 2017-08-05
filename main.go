@@ -11,8 +11,12 @@ func main() {
 	jsonMap := fetchUrl(url)
 	metrics := getMetrics(jsonMap)
 	fmt.Println(metrics)
-	state := storeMetrics(url, "redis", metrics)
+	conn := connectRedis("redis")
+	state := storeMetrics(url, conn, metrics)
 	fmt.Println(state)
+	matrix := getStoredMetricMatrix(url, conn)
+	fmt.Println(matrix)
+	defer conn.Close()
 }
 
 func check(e error) {
