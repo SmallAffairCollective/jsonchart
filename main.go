@@ -11,6 +11,8 @@ func main() {
 	jsonMap := fetchUrl(url)
 	metrics := getMetrics(jsonMap)
 	fmt.Println(metrics)
+	state := storeMetrics(url, "redis", metrics)
+	fmt.Println(state)
 }
 
 func check(e error) {

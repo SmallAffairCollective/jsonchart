@@ -1,6 +1,10 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/mediocregopher/radix.v2/redis"
+)
 
 func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
 
@@ -19,5 +23,22 @@ func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
 	}
 
 	return metrics
+
+}
+
+func storeMetrics(url string, redisHost string, metrics map[string]float64) bool {
+
+	conn, er := redis.Dial("tcp", redisHost+":6379")
+	check(er)
+
+	defer conn.Close()
+
+	resp := conn.Cmd("HMSET", url, metrics)
+
+	if resp.Err != nil {
+		return false
+	}
+
+	return true
 
 }
