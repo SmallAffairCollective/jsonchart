@@ -13,7 +13,7 @@ func parseUrl(url string) string {
 }
 
 // return data object from given url
-func fetchUrl(url string) (map[string]interface{}, string) {
+func fetchUrl(url string) map[string]interface{} {
 
 	result, err := goreq.Request{Uri: url}.Do()
 	check(err)
@@ -26,5 +26,5 @@ func fetchUrl(url string) (map[string]interface{}, string) {
 	err = json.Unmarshal([]byte(stringRes), &jsonMap)
 	check(err)
 
-	return jsonMap, stringRes
+	return jsonMap
 }
