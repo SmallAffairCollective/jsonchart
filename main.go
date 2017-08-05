@@ -8,7 +8,15 @@ import (
 func main() {
 	url := os.Args[1] // url from command line
 
-	jsonMap := fetchUrl(url)
+	jsonMap, stringRes := fetchUrl(url)
+
+	// testing, not working yet
+	path := make(map[string]string)
+	for k := range jsonMap {
+		path = goDeeper(stringRes, path, k)
+	}
+	fmt.Println("path:", path)
+
 	metrics := getMetrics(jsonMap)
 	fmt.Println(metrics)
 	conn := connectRedis("redis")
