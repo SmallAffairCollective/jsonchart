@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+
 	"github.com/franela/goreq"
 )
 
@@ -12,11 +13,11 @@ func parseUrl(url string) string {
 }
 
 // return data object from given url
-func fetchUrl(url string) map[string]interface{} {
+func fetchUrl(url string) (map[string]interface{}, string) {
 
 	result, err := goreq.Request{Uri: url}.Do()
 	check(err)
-	
+
 	jsonMap := make(map[string]interface{})
 
 	stringRes, err := result.Body.ToString()
@@ -25,5 +26,5 @@ func fetchUrl(url string) map[string]interface{} {
 	err = json.Unmarshal([]byte(stringRes), &jsonMap)
 	check(err)
 
-	return jsonMap 
-} 
+	return jsonMap, stringRes
+}
