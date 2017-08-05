@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mediocregopher/radix.v2/redis"
@@ -67,4 +68,19 @@ func getStoredMetricMatrix(url string, conn *redis.Client) map[string]map[string
 	}
 
 	return matrix
+}
+
+func flattenMetricMatrix(url string, matrix map[string]map[string]float64) map[string]map[string][]float64 {
+
+	flattenedMatrix := make(map[string]map[string][]float64)
+	flattenedMatrix[url] = make(map[string][]float64)
+
+	for item := range matrix {
+		if strings.HasPrefix(item, url) {
+			for field := range matrix[item] {
+				flattenedMatrix[url][field] = append(flattenedMatrix[url][field], matrix[item][field])
+			}
+		}
+	}
+	return flattenedMatrix
 }
