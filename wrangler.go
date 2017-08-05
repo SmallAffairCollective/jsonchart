@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/mediocregopher/radix.v2/redis"
 )
@@ -33,8 +34,14 @@ func storeMetrics(url string, redisHost string, metrics map[string]float64) bool
 
 	defer conn.Close()
 
-	resp := conn.Cmd("HMSET", url, metrics)
+	unixTime := time.Now().Unix()
 
+	resp := conn.Cmd("SADD", url, strconv.FormatInt(unixTime, 10))
+	if resp.Err != nil {
+		return false
+	}
+
+	resp = conn.Cmd("HMSET", url+strconv.FormatInt(unixTime, 10), metrics)
 	if resp.Err != nil {
 		return false
 	}
