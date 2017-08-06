@@ -4,10 +4,11 @@ import (
 	"html"
 	"io/ioutil"
 	"os"
+	"strconv"
 )
 
 func writeGChartHtml() {
-	const s = `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script><script type="text/javascript" src="chart.js"></script><div id="chart_div"></div>`
+	const s = `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script><script type="text/javascript" src="chart.js"></script><div id="chart_div" style="width: 900px; height: 500px"></div>`
 	content := []byte(html.UnescapeString(s))
 
 	_ = os.Mkdir("www", 0755)
@@ -15,7 +16,7 @@ func writeGChartHtml() {
 	check(err)
 }
 
-func writeGChartJs(title string, data map[string][]float64) {
+func writeGChartJs(title string, delay int, iterations int, data map[string][]float64) {
 
 	const s = `google.charts.load('current', {packages: ['corechart', 'line']});
 google.charts.setOnLoadCallback(drawCurveTypes);
@@ -25,6 +26,29 @@ function drawCurveTypes() {
 	data.addColumn('number', 'X');`
 
 	content := []byte(html.UnescapeString(s))
+
+	dataRows := [][]float64{}
+	counter := 0
+	delayTime := delay - 1
+	for counter < iterations {
+		row := []float64{float64(delayTime)}
+		for field := range data {
+			row = append(row, float64(data[field][counter]))
+		}
+		dataRows = append(dataRows, row)
+		delayTime += delay
+		counter++
+	}
+
+	dataStr := ""
+	for _, row := range dataRows {
+		dataStr += "["
+		for _, value := range row {
+			dataStr += strconv.FormatFloat(value, 'f', -1, 64) + ", "
+		}
+		dataStr += "], "
+	}
+	dataStr = dataStr[:len(dataStr)-1]
 
 	columnData := ""
 	for field := range data {
@@ -48,8 +72,7 @@ function drawCurveTypes() {
 	check(err)
 
 	// write actual value data
-	// TODO put in actual data here
-	values := "\n\n    data.addRows([])\n\n"
+	values := "\n\n    data.addRows([" + dataStr + "])\n\n"
 	_, err = f.WriteString(values)
 	check(err)
 

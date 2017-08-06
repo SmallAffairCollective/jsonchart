@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -10,6 +11,8 @@ func main() {
 	arg1 := os.Args[1] // url from command line
 	arg2 := os.Args[2] // delay from cmd in secs
 	arg3 := os.Args[3] // iterations from cmd
+
+	// TODO don't allow delay to be less than 1
 
 	// convert delay and iterations from strings to ints
 	delay, er := strconv.Atoi(arg2)
@@ -33,13 +36,13 @@ func alwaysBeGettin(url string, delay int, iterations int) {
 		storeMetrics(url, conn, metrics)
 		matrix := getStoredMetricMatrix(url, conn)
 		flattenedMatrix = flattenMetricMatrix(url, matrix)
-		printMatrix(flattenedMatrix)
 		defer conn.Close()
+		fmt.Println("Completed iteration: ", i, "/", iterations)
 		time.Sleep(time.Second * time.Duration(delay))
 		i++
 	}
 	writeGChartHtml()
-	writeGChartJs(url, flattenedMatrix[url])
+	writeGChartJs(url, delay, iterations, flattenedMatrix[url])
 }
 
 func check(e error) {
