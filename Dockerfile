@@ -9,4 +9,4 @@ RUN go get github.com/SmallAffairCollective/jsonchart
 WORKDIR /go/src/github.com/SmallAffairCollective/jsonchart
 
 ENTRYPOINT ["/go/bin/jsonchart"]
-CMD ["http://genit/genit", "1", "5"]
+CMD ["http://genit/genit", "2", "15"]

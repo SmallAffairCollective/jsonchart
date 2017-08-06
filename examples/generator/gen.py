@@ -19,8 +19,8 @@ class GenerateIt:
     def GET():
         a = {}
         i = 1
-        while i < 100:
-            a['field'+str(i)] = random.randrange(0, i)
+        while i < 10:
+            a['field'+str(i)] = random.randrange(1, 500*i)
             i += 1
         return json.dumps(a)
 
