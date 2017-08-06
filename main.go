@@ -24,6 +24,7 @@ func main() {
 
 func alwaysBeGettin(url string, delay int, iterations int) {
 
+	flattenedMatrix := make(map[string]map[string][]float64)
 	i := 1
 	for i <= iterations {
 		jsonMap := fetchUrl(url)
@@ -31,13 +32,14 @@ func alwaysBeGettin(url string, delay int, iterations int) {
 		conn := connectRedis("redis")
 		storeMetrics(url, conn, metrics)
 		matrix := getStoredMetricMatrix(url, conn)
-		flattenedMatrix := flattenMetricMatrix(url, matrix)
+		flattenedMatrix = flattenMetricMatrix(url, matrix)
 		printMatrix(flattenedMatrix)
 		defer conn.Close()
 		time.Sleep(time.Second * time.Duration(delay))
 		i++
 	}
 	writeGChartHtml()
+	writeGChartJs(url, flattenedMatrix[url])
 }
 
 func check(e error) {
