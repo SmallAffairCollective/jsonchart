@@ -1,7 +1,7 @@
 run: install clean
 	docker run -d --name genit genit
 	docker run -d -p 6379:6379 --name redis redis:alpine
-	docker run --rm -it --link redis:redis --link genit:genit jsonchart
+	docker run --rm -it -v $$(pwd):/go/src/github.com/SmallAffairCollective/jsonchart --link redis:redis --link genit:genit jsonchart
 
 dev: install
 	docker run -it -v $$(pwd):/go/src/github.com/SmallAffairCollective/jsonchart --entrypoint=/bin/sh jsonchart
