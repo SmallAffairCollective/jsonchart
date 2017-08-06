@@ -37,6 +37,7 @@ func alwaysBeGettin(url string, delay int, iterations int) {
 		time.Sleep(time.Second * time.Duration(delay))
 		i++
 	}
+	writeGChartHtml()
 }
 
 func check(e error) {
