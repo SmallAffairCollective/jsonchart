@@ -6,17 +6,28 @@ import (
 	"time"
 
 	"github.com/mediocregopher/radix.v2/redis"
+	"github.com/tokuhirom/json_path_scanner"
 )
 
 func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
 
 	metrics := make(map[string]float64)
 
-	for key, item := range jsonMap {
-		if item != nil {
-			if value, ok := item.(float64); ok {
+	ch := make(chan *json_path_scanner.PathValue)
+	go func() {
+		json_path_scanner.Scan(jsonMap, ch)
+	}()
+
+	for p := range ch {
+		if p.Value != nil {
+			key := p.Path[2:len(p.Path)]
+			// format path to make it cleaner
+			key = strings.Replace(key, "[", ".", -1)
+			key = strings.Replace(key, "]", "", -1)
+			key = strings.Replace(key, "'", "", -1)
+			if value, ok := p.Value.(float64); ok {
 				metrics[key] = value
-			} else if value, ok := item.(string); ok {
+			} else if value, ok := p.Value.(string); ok {
 				if v, err := strconv.Atoi(value); err == nil {
 					metrics[key] = float64(v)
 				}

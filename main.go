@@ -14,23 +14,28 @@ func main() {
 	arg2 := os.Args[2] // delay from cmd in secs
 	arg3 := os.Args[3] // iterations from cmd
 
+	redis_host := "redis"
+	if len(os.Args) > 4 {
+		redis_host = os.Args[4] // redis host
+	}
+
 	url, delay, iterations, er := validateArgs(arg1, arg2, arg3)
 	if er != nil {
 		fmt.Println(er.Error())
 		return
 	}
 
-	alwaysBeGettin(url, delay, iterations)
+	alwaysBeGettin(url, delay, iterations, redis_host)
 }
 
-func alwaysBeGettin(url string, delay int, iterations int) {
+func alwaysBeGettin(url string, delay int, iterations int, redis_host string) {
 
 	flattenedMatrix := make(map[string]map[string][]float64)
 	i := 1
 	for i <= iterations {
 		jsonMap := fetchJson(url)
 		metrics := getMetrics(jsonMap)
-		conn := connectRedis("redis")
+		conn := connectRedis(redis_host)
 		storeMetrics(url, conn, metrics)
 		matrix := getStoredMetricMatrix(url, conn)
 		flattenedMatrix = flattenMetricMatrix(url, matrix)
