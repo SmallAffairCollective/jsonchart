@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func writeGChartHtml() {
+func writeGChartHTML() {
 	const s = `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script><script type="text/javascript" src="chart.js"></script><div id="chart_div" style="width: 1200px; height: 800px"></div>`
 	content := []byte(html.UnescapeString(s))
 
