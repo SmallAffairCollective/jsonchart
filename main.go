@@ -45,7 +45,6 @@ func alwaysBeGettin(url string, delay int, iterations int, redisHost string) {
 		i++
 	}
 	writeGChartHTML()
-	fmt.Println(flattenedMatrix)
 	writeGChartJs(url, delay, iterations, flattenedMatrix[url])
 }
 

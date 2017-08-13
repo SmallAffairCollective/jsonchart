@@ -30,11 +30,17 @@ function drawCurveTypes() {
 	dataRows := [][]float64{}
 	counter := 0
 	delayTime := delay - 1
+	var fields []string
+	for field := range data {
+		fields = append(fields, field)
+	}
+
 	for counter < iterations {
 		row := []float64{float64(delayTime)}
-		for field := range data {
-			row = append(row, float64(data[field][counter]))
+		for field := range fields {
+			row = append(row, float64(data[fields[field]][counter]))
 		}
+
 		dataRows = append(dataRows, row)
 		delayTime += delay
 		counter++
@@ -46,13 +52,14 @@ function drawCurveTypes() {
 		for _, value := range row {
 			dataStr += strconv.FormatFloat(value, 'f', -1, 64) + ", "
 		}
+		dataStr = dataStr[:len(dataStr)-2]
 		dataStr += "], "
 	}
-	dataStr = dataStr[:len(dataStr)-1]
+	dataStr = dataStr[:len(dataStr)-2]
 
 	columnData := ""
-	for field := range data {
-		columnData += "\n\tdata.addColumn('number', '" + field + "');"
+	for field := range fields {
+		columnData += "\n\tdata.addColumn('number', '" + fields[field] + "');"
 	}
 
 	columnData += "\n"
