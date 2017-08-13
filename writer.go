@@ -8,7 +8,7 @@ import (
 )
 
 func writeGChartHtml() {
-	const s = `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script><script type="text/javascript" src="chart.js"></script><div id="chart_div" style="width: 900px; height: 500px"></div>`
+	const s = `<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script><script type="text/javascript" src="chart.js"></script><div id="chart_div" style="width: 1200px; height: 800px"></div>`
 	content := []byte(html.UnescapeString(s))
 
 	_ = os.Mkdir("www", 0755)

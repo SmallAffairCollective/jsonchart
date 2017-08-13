@@ -15,6 +15,7 @@ func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
 
 	ch := make(chan *json_path_scanner.PathValue)
 	go func() {
+		// TODO try/catch if fails check if it's flat, otherwise fail
 		json_path_scanner.Scan(jsonMap, ch)
 	}()
 
