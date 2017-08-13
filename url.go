@@ -8,9 +8,9 @@ import (
 	"github.com/franela/goreq"
 )
 
-func parseUrl(url string) (string, error) {
-	isUrl := govalidator.IsURL(url)
-	if !isUrl {
+func parseURL(url string) (string, error) {
+	isURL := govalidator.IsURL(url)
+	if !isURL {
 		return "", errors.New("error: please enter a valid url")
 	}
 
@@ -18,11 +18,11 @@ func parseUrl(url string) (string, error) {
 }
 
 // return json data object from given url
-func fetchJson(url string) map[string]interface{} {
+func fetchJSON(url string) map[string]interface{} {
 
 	jsonMap := make(map[string]interface{})
 
-	stringRes, err := fetchUrlData(url)
+	stringRes, err := fetchURLData(url)
 	check(err)
 
 	err = json.Unmarshal([]byte(stringRes), &jsonMap)
@@ -32,7 +32,7 @@ func fetchJson(url string) map[string]interface{} {
 }
 
 // fetch data from Url
-func fetchUrlData(url string) (string, error) {
+func fetchURLData(url string) (string, error) {
 
 	result, err := goreq.Request{Uri: url}.Do()
 	check(err)
