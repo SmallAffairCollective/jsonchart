@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/kataras/iris"
 )
 
 func main() {
@@ -26,6 +28,16 @@ func main() {
 	}
 
 	alwaysBeGettin(url, delay, iterations, redisHost)
+	serve()
+}
+
+func serve() {
+
+	app := iris.Default()
+
+	// handle js and html files
+	app.StaticWeb("/", "./www")
+	app.Run(iris.Addr(":8080"))
 }
 
 func alwaysBeGettin(url string, delay int, iterations int, redisHost string) {
