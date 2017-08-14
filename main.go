@@ -15,6 +15,7 @@ func main() {
 	var delay int
 	var iterations int
 	var redisHost string
+	var serve bool
 	var url string
 
 	app := cli.NewApp()
@@ -23,50 +24,64 @@ func main() {
 	app.Version = "0.1.0"
 	app.Flags = []cli.Flag{
 		cli.IntFlag{
-			Name:        "delay",
+			Name:        "delay, d",
 			Value:       1,
 			Usage:       "delay in `SECONDS` between polling URL",
 			Destination: &delay,
 		},
 		cli.IntFlag{
-			Name:        "iterations",
+			Name:        "iterations, i",
 			Value:       1,
 			Usage:       "number of times to poll URL, -1 runs indefinitely",
 			Destination: &iterations,
 		},
 		cli.StringFlag{
-			Name:        "redis",
+			Name:        "redis, r",
 			Value:       "redis",
 			Usage:       "redis `HOST` to connect to",
 			Destination: &redisHost,
 		},
+		cli.BoolFlag{
+			Name:        "serve, s",
+			Usage:       "startup webserver to serve up charts",
+			Destination: &serve,
+		},
 		cli.StringFlag{
-			Name:        "url",
+			Name:        "url, u",
 			Usage:       "`URL` to poll from",
 			Destination: &url,
 		},
 	}
 
-	app.Run(os.Args)
+	app.Action = func(c *cli.Context) error {
 
-	if url != "" {
-		url, delay, er := validateArgs(url, delay)
-		if er != nil {
-			fmt.Println(er.Error())
-			return
+		if url != "" {
+			url, delay, er := validateArgs(url, delay)
+			if er != nil {
+				fmt.Println(er.Error())
+				return er
+			}
+			if serve {
+				go alwaysBeGettin(url, delay, iterations, redisHost)
+			} else {
+				alwaysBeGettin(url, delay, iterations, redisHost)
+			}
+		} else {
+			// TODO write out html/js
+			fmt.Println("no url provided, nothing new to get")
 		}
 
-		go alwaysBeGettin(url, delay, iterations, redisHost)
-	} else {
-		writeGChartHTML()
-		// TODO write JS of existing data in redis
+		if serve {
+			serveWeb()
+		}
+		return nil
 	}
 
-	serve()
+	app.Run(os.Args)
 
 }
 
-func serve() {
+func serveWeb() {
 
 	app := iris.Default()
 
@@ -91,7 +106,7 @@ func alwaysBeGettin(url string, delay int, iterations int, redisHost string) {
 		if iterations == -1 {
 			fmt.Println("completed iteration: ", counter, "/ inf")
 		} else {
-			fmt.Println("completed iteration: ", i, "/", iterations)
+			fmt.Println("completed iteration: ", counter, "/", iterations)
 		}
 		time.Sleep(time.Second * time.Duration(delay))
 		writeGChartHTML()
