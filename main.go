@@ -5,30 +5,65 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/kataras/iris"
+	"github.com/urfave/cli"
 )
 
 func main() {
-	arg1 := os.Args[1] // url from cmd
-	arg2 := os.Args[2] // delay from cmd in secs
-	arg3 := os.Args[3] // iterations from cmd
+	var delay int
+	var iterations int
+	var redisHost string
+	var url string
 
-	redisHost := "redis"
-	if len(os.Args) > 4 {
-		redisHost = os.Args[4] // redis host
+	app := cli.NewApp()
+	app.Name = "jsonchart"
+	app.Usage = "generate charts from JSON endpoints"
+	app.Version = "0.1.0"
+	app.Flags = []cli.Flag{
+		cli.IntFlag{
+			Name:        "delay",
+			Value:       1,
+			Usage:       "delay in `SECONDS` between polling URL",
+			Destination: &delay,
+		},
+		cli.IntFlag{
+			Name:        "iterations",
+			Value:       1,
+			Usage:       "number of times to poll URL, -1 runs indefinitely",
+			Destination: &iterations,
+		},
+		cli.StringFlag{
+			Name:        "redis",
+			Value:       "redis",
+			Usage:       "redis `HOST` to connect to",
+			Destination: &redisHost,
+		},
+		cli.StringFlag{
+			Name:        "url",
+			Usage:       "`URL` to poll from",
+			Destination: &url,
+		},
 	}
 
-	url, delay, iterations, er := validateArgs(arg1, arg2, arg3)
-	if er != nil {
-		fmt.Println(er.Error())
-		return
+	app.Run(os.Args)
+
+	if url != "" {
+		url, delay, er := validateArgs(url, delay)
+		if er != nil {
+			fmt.Println(er.Error())
+			return
+		}
+
+		go alwaysBeGettin(url, delay, iterations, redisHost)
+	} else {
+		writeGChartHTML()
+		// TODO write JS of existing data in redis
 	}
 
-	alwaysBeGettin(url, delay, iterations, redisHost)
 	serve()
+
 }
 
 func serve() {
@@ -43,8 +78,9 @@ func serve() {
 func alwaysBeGettin(url string, delay int, iterations int, redisHost string) {
 
 	flattenedMatrix := make(map[string]map[string][]float64)
-	i := 1
-	for i <= iterations {
+	i := iterations
+	counter := 1
+	for i != 0 {
 		jsonMap := fetchJSON(url)
 		metrics := getMetrics(jsonMap)
 		conn := connectRedis(redisHost)
@@ -52,49 +88,47 @@ func alwaysBeGettin(url string, delay int, iterations int, redisHost string) {
 		matrix := getStoredMetricMatrix(url, conn)
 		flattenedMatrix = flattenMetricMatrix(url, matrix)
 		defer conn.Close()
-		fmt.Println("completed iteration: ", i, "/", iterations)
+		if iterations == -1 {
+			fmt.Println("completed iteration: ", counter, "/ inf")
+		} else {
+			fmt.Println("completed iteration: ", i, "/", iterations)
+		}
 		time.Sleep(time.Second * time.Duration(delay))
-		i++
+		writeGChartHTML()
+		writeGChartJs(url, delay, counter, flattenedMatrix[url])
+		i--
+		counter++
 	}
-	writeGChartHTML()
-	writeGChartJs(url, delay, iterations, flattenedMatrix[url])
+
 }
 
-func validateArgs(arg1 string, arg2 string, arg3 string) (string, int, int, error) {
-	// convert delay and iterations from strings to ints
-	delay, er := strconv.Atoi(arg2)
-	if er != nil {
-		return "", -1, -1, errors.New("error: delay must be a number greater than 0")
-	}
-	iterations, er := strconv.Atoi(arg3)
-	if er != nil {
-		return "", -1, -1, errors.New("error: iterations must be a number greater than 0")
-	}
+func validateArgs(url string, delay int) (string, int, error) {
 
-	// Make sure delay argument is not less than 1
 	if delay < 1 {
-		return "", -1, -1, errors.New("error: delay must be greater than 0")
+		return "", -1, errors.New("error: delay must be a number greater than 0")
 	}
 
 	// Validate URL
-	url, er := parseURL(arg1)
+	url, er := parseURL(url)
 	if er != nil {
-		return "", -1, -1, errors.New(er.Error())
+		return "", -1, errors.New(er.Error())
 	}
 
 	// Make sure data can be retrieved from URL
 	s, er := fetchURLData(url)
 	if er != nil {
-		return "", -1, -1, errors.New(er.Error())
+		return "", -1, errors.New(er.Error())
 	}
 
 	// Validate JSON
 	var js map[string]interface{}
 	if json.Unmarshal([]byte(s), &js) != nil {
-		return "", -1, -1, errors.New("error: url does not return valid json")
+		return "", -1, errors.New("error: url does not return valid json")
 	}
 
-	return url, delay, iterations, nil
+	// TODO validate redisHost
+
+	return url, delay, nil
 }
 
 func check(e error) {
