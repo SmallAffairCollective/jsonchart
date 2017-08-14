@@ -7,8 +7,8 @@ local: clean go examples generator redis
 	@echo ""
 	@echo "some examples to try out:"
 	@echo ""
-	@echo "\t./jsonchart http://localhost:8000/genit 1 2 localhost"
-	@echo "\t./jsonchart http://localhost:8888/example2.json 2 2 localhost"
+	@echo "\t./jsonchart --url http://localhost:8000/genit --delay 1 --iterations 2 --redis localhost --serve"
+	@echo "\t./jsonchart --url http://localhost:8888/example2.json --delay 2 --iterations 2 --redis localhost --serve"
 	@echo ""
 
 examples: clean install

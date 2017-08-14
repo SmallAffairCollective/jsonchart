@@ -11,4 +11,4 @@ WORKDIR /go/src/github.com/SmallAffairCollective/jsonchart
 EXPOSE 8080
 
 ENTRYPOINT ["/go/bin/jsonchart"]
-CMD ["http://genit/genit", "1", "5"]
+CMD ["-u", "http://genit/genit", "-d", "1", "-i", "5", "-s"]
