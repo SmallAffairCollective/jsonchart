@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/mediocregopher/radix.v2/redis"
-	"github.com/tokuhirom/json_path_scanner"
+	"github.com/SmallAffairCollective/json_path_scanner"
 )
 
 func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
