@@ -93,6 +93,9 @@ func serveWeb() {
 func alwaysBeGettin(url string, delay int, iterations int, redisHost string) {
 
 	flattenedMatrix := make(map[string]map[string][]float64)
+	fields := getFields(fetchJSON(url))
+	fields = queryUser(fields)
+	fmt.Println(fields)
 	i := iterations
 	counter := 1
 	for i != 0 {
