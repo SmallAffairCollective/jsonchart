@@ -5,10 +5,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mediocregopher/radix.v2/redis"
 	"github.com/SmallAffairCollective/json_path_scanner"
+	"github.com/mediocregopher/radix.v2/redis"
 )
 
+func getFields(jsonMap map[string]interface{}) []string {
+	var keys []string
+	metrics := getMetrics(jsonMap)
+	for k := range metrics {
+		keys = append(keys, k)
+	}
+	return keys
+}
 func getMetrics(jsonMap map[string]interface{}) map[string]float64 {
 
 	metrics := make(map[string]float64)
