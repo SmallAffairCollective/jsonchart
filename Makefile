@@ -18,7 +18,7 @@ generator: clean install
 	docker run -d -p 8000:80 --name genit genit
 
 dev: install
-	docker run -rm -it -v $$(pwd):/go/src/github.com/SmallAffairCollective/jsonchart --entrypoint=/bin/sh jsonchart
+	docker run --rm -it -v $$(pwd):/go/src/github.com/SmallAffairCollective/jsonchart --entrypoint=/bin/sh jsonchart
 
 redis: clean
 	docker run -d -p 6379:6379 --name redis redis:alpine
